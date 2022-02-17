@@ -27,8 +27,21 @@ outdir=args[2]
 genomeAssembly=  args[3]   # {GRCh37 , RCh38}
 
 library(haploR)
-query2= queryRegulome(query = data,  genomeAssembly = genomeAssembly)
+query= queryRegulome(query = data,  genomeAssembly = genomeAssembly,timeout=100000)
 
 #A data frame (table) OR a list with the following items: - guery_coordinates - features - regulome_score - variants - nearby_snps - assembly
-output2=paste0(outdir,'/',"results_Regulome.txt",sep="")
-capture.output(query2, file=output2,row.names=F)
+output1=paste0(outdir,'/',"results_Regulome.txt",sep="")
+output2=paste0(outdir,'/',"results_Regulome_nearby_snps.txt",sep="")
+out=c("guery_coordinates","features","regulome_score","assembly")
+df=data.frame(nrow=1)
+for ( i in 1:length(out)){
+df=cbind(df, as.data.frame(query[[data]][out[i]]))
+}
+
+nearby_snps=as.data.frame(query[[data]]['nearby_snps'])
+write.table(df[,2:dim(df)[2]], row.names=FALSE, file= output1, quote = TRUE, sep = "\t")
+write.table(nearby_snps, row.names=FALSE, file= output2, quote = TRUE, sep = "\t")
+
+
+
+

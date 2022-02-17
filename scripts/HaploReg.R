@@ -33,15 +33,15 @@ genetypes= args[7]  # {"gencode", "refseq"}
 
 library(haploR)
 df <- read.table(gwas_summary,  header=T)
-data= as.character(df$SNPs)
-names(data)=as.character(df$SNPs)
-query=queryHaploreg(query = data , study = NULL, ldThresh = ldThresh, ldPop = ldPop, epi = epi, cons = cons, genetypes = genetypes)
+data= as.character(df[,1])
+names(data)=as.character(df[,1])
+query=queryHaploreg(query = data , study = NULL, ldThresh = ldThresh, ldPop = ldPop, epi = epi, cons = cons, genetypes = genetypes,timeout=100000)
 # file = NULL,
 #url = "https://pubs.broadinstitute.org/mammals/haploreg/haploreg.php",
 #timeout = 10, encoding = "UTF-8", verbose = FALSE)
 
-results=data.frame(query)
+#results=data.frame(query)
 
-output1=paste0(outdir,'/',"results_haploR.txt",sep="")
+output=paste0(outdir,'/',"results_haploR.txt",sep="")
 
-write.table(as.data.frame(query), row.names=FALSE, file= output1)
+write.table(as.data.frame(query), row.names=FALSE, file= output, quote = TRUE, sep = "\t")
