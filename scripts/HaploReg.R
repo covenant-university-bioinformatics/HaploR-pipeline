@@ -35,13 +35,42 @@ library(haploR)
 df <- read.table(gwas_summary,  header=T)
 data= as.character(df[,1])
 names(data)=as.character(df[,1])
-query=queryHaploreg(query = data , study = NULL, ldThresh = ldThresh, ldPop = ldPop, epi = epi, cons = cons, genetypes = genetypes,timeout=100000)
+#query=queryHaploreg(query = data , study = NULL, ldThresh = ldThresh, ldPop = ldPop, epi = epi, cons = cons, genetypes = genetypes,timeout=100000)
 # file = NULL,
 #url = "https://pubs.broadinstitute.org/mammals/haploreg/haploreg.php",
 #timeout = 10, encoding = "UTF-8", verbose = FALSE)
 
 #results=data.frame(query)
+nRsids= length(data)
+df <- data.frame(matrix(ncol = 35, nrow = 0))
+error=c()
+for (i in 1:nRsids){
+     result = tryCatch({
+        query=queryHaploreg(query = data[i] , study = NULL, ldThresh = ldThresh, 
+        ldPop = ldPop, epi = epi, cons = cons, genetypes = genetypes,timeout=100000)
+     }, warning = function(w) {
+       cat(" Warning \n")
+       query= data.frame(matrix(ncol = 35, nrow = 0))
+       return (query)
+    }, error = function(e) {
+      cat("error when trying this SNP: ", data[i], " \n") 
+       query= data.frame(matrix(ncol = 35, nrow = 0))
+        return (query)
+   })
+ if(dim(result)[1]>0){
+ df=rbind(df, as.data.frame(result),stringsAsFactors=FALSE)
+}else{error=c(error,data[i])}
+}
 
 output=paste0(outdir,'/',"results_haploR.txt",sep="")
 
-write.table(as.data.frame(query), row.names=FALSE, file= output, quote = TRUE, sep = "\t")
+write.table(as.data.frame(df), row.names=FALSE, file= output, quote = TRUE, sep = "\t")
+
+errors=paste0(outdir,'/',"Errors_haploR.txt",sep="")
+df_errors <- data.frame(matrix(ncol = 0, nrow = length(errors))
+if(dim(df_errors)[1]>0){
+ df_errors=cbind(df_errors, errors,stringsAsFactors=FALSE)
+ }
+ 
+write.table(as.data.frame(df_errors), row.names=FALSE, file= errors, quote = TRUE, sep = "\t")
+
