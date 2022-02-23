@@ -25,7 +25,7 @@ elif [[ $type_of_analysis = "Regulome" ]]; then
   genomeAssembly=$4   # {GRCh37 , RCh38}
 
   Rscript --vanilla ${bindir}/Regulome.R $SNP  $outdir  $genomeAssembly
-#./haploR.sh  Regulome rs1279474447 ourdir_Regulome 37
+#./haploR.sh  Regulome rs1279474447 outdir_Regulome 37
 fi
 
 
