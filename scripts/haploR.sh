@@ -40,7 +40,7 @@ fi
 # [7] "ref"                         "alt"
 # [9] "AFR"                         "AMR"
 # [11] "ASN"                         "EUR"
-# [13] "GERP_cons"                   "SiPhy_cons"
+# [13] "GERP_cons" X                   "SiPhy_cons" X
 # [15] "Chromatin_States"            "Chromatin_States_Imputed"
 # [17] "Chromatin_Marks"             "DNAse"
 # [19] "Proteins"                    "eQTL"
