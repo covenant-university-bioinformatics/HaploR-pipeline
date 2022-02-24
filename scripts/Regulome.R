@@ -55,27 +55,24 @@ if(is.list(result)){
    coordinates <- data.frame(matrix(ncol = 2, nrow = 0))
    colnames(coordinates)=c("lt","gte")
 
-
-   alt_allele_freq= c("TOPMED", "1000Genomes", "ALSPAC", "GnomAD", "TWINSUK")
-   alt_allele =  data.frame(matrix(ncol = 6, nrow = 0))
-   colnames(alt_allele)= c("alt_allele",alt_allele_freq)
+   alt_allele =  data.frame(matrix(ncol = 2, nrow = 0))
+   colnames(alt_allele)= c("alt_allele","alt_allele_freq")
 
 
    rsids = data.frame(matrix(ncol = 1, nrow = 0))
 
    chrom= data.frame(matrix(ncol = 1, nrow = 0))
 
-   ref_allele_freq= c("TOPMED", "1000Genomes", "ALSPAC", "GnomAD", "TWINSUK")
-   ref_allele =  data.frame(matrix(ncol = 6, nrow = 0))
-   colnames(ref_allele)= c("ref_allele",ref_allele_freq)
+   ref_allele =  data.frame(matrix(ncol = 2, nrow = 0))
+   colnames(ref_allele)= c("ref_allele","ref_allele_freq")
 
    maf= data.frame(matrix(ncol = 1, nrow = 0))
 
    final_names= c("start", "end",
-   "alt_allele","alt_allele_TOPMED", "alt_allele_1000Genomes", "alt_allele_ALSPAC", "alt_allele_GnomAD", "alt_allele_TWINSUK",
+   "alt_allele","alt_allele_freq",
    "rsid",
    "chrom",
-   "ref_allele","ref_allele_TOPMED", "ref_allele_1000Genomes", "ref_allele_ALSPAC", "ref_allele_GnomAD", "ref_allele_TWINSUK",
+   "ref_allele","ref_allele_freq",
    "maf"
    )
 
@@ -92,23 +89,86 @@ if(is.list(result)){
       coor=df_nearby_snps["coordinates"][j,]
       coordinates=rbind(coordinates,coor[[1]],stringsAsFactors=FALSE)
 
-      #"alt_allele_freq
+      ##"alt_allele_freq
       alt_vector=c()
       alt=names(df_nearby_snps["alt_allele_freq"][j,][[1]])
-      #cat("\n")
-      alt_vector=c(alt_vector,as.character(alt))
-      freq =df_nearby_snps["alt_allele_freq"][j,]
-      for (jj in 1:length(alt_allele_freq)){
-           freq_=freq[[1]][[alt]][alt_allele_freq[jj]]
-           #cat(alt, "-->", freq_ ,"...")
-           alt_vector=c(alt_vector,as.character(freq_))
-           unname(alt_vector)
-           #cat(alt_vector,"\n")
+      if(length(alt)>=1){
+        alt_collapse=paste(alt, collapse=";")
+        }else{
+            alt_collapse=paste("NA", collapse=";");
       }
-     unname(alt_vector)
-     alt_allele=rbind(alt_allele,alt_vector,stringsAsFactors=FALSE)
-     colnames(alt_allele)= c("alt_allele",alt_allele_freq)
+    
+ 
+      alt_vector=c(alt_vector,as.character(alt_collapse))
+      alt_freq=c()
+      freq =df_nearby_snps["alt_allele_freq"][j,]
+      if (length(alt)==0){
+          f=paste0(freq[[1]],":",'NA')
+          alt_freq=c(alt_freq, f)
+          alt_freq=paste0(alt_freq, collapse=";")
+          alt_vector=c(alt_vector,as.character(alt_freq))
+      }else{
+         for(k in 1:length(alt)){
+            alt_query=alt[k];
+            n_f= names(freq[[1]][[alt_query]])
+            for(kk in 1:length(n_f)){
+               n_f_query=n_f[kk]
+               f1=unname(freq[[1]][[alt_query]][n_f_query])
+               f=paste0(n_f_query,'(',alt_query,')',":",f1)
+               alt_freq=c(alt_freq, f)
+               alt_freq=paste0(alt_freq, collapse=";")
+                }
+                 
+         }#for
+        alt_vector=c(alt_vector,as.character(alt_freq))
+        
+      }#else
+      unname(alt_vector)
+      alt_allele=rbind(alt_allele,alt_vector,stringsAsFactors=FALSE)
+      colnames(alt_allele)= c("alt_allele","alt_allele_freq")
+      
+    #ref_allele_freq
+      ref_vector=c()
+      ref=names(df_nearby_snps["ref_allele_freq"][j,][[1]])
+      if(length(ref)>=1){
+        ref_collapse=paste(ref, collapse=";")
+        }else{
+            ref_collapse=paste("NA", collapse=";");
+      }
 
+
+      ref_vector=c(ref_vector,as.character(ref_collapse))
+      ref_freq=c()
+      freq_ref =df_nearby_snps["ref_allele_freq"][j,]
+      if (length(ref)==0){
+          f=paste0(freq_ref[[1]],":",'NA')
+          ref_freq=c(ref_freq, f)
+          ref_freq=paste0(ref_freq, collapse=";")
+          ref_vector=c(ref_vector,as.character(ref_freq))
+    
+          }else{
+           for(k in 1:length(ref)){
+               ref_query=ref[k];
+               n_f= names(freq_ref[[1]][[ref_query]])
+            for(kk in 1:length(n_f)){
+               n_f_query=n_f[kk]
+               f1=unname(freq_ref[[1]][[ref_query]][n_f_query])
+               f=paste0(n_f_query,'(',ref_query,')',":",f1)
+               ref_freq=c(ref_freq, f)
+               ref_freq=paste0(ref_freq, collapse=";")
+                }
+                
+           
+         }#for
+       ref_vector=c(ref_vector,as.character(ref_freq)) #--->
+       #cat (ref_vector,"\n")
+      }#else
+      unname(ref_vector)
+      ref_allele=rbind(ref_allele,ref_vector,stringsAsFactors=FALSE)
+      colnames(ref_allele)= c("ref_allele","ref_allele_freq")
+   
+   
+   
     #"rsid"
     rsid=as.character(df_nearby_snps[["rsid"]][j][[1]])
     rsids=rbind(rsids, rsid,stringsAsFactors=FALSE)
@@ -118,20 +178,6 @@ if(is.list(result)){
     chr=as.character(df_nearby_snps[["chrom"]][j][[1]])
     chrom=rbind(chrom, chr,stringsAsFactors=FALSE)
     colnames(chrom)="chrom"
-
-    #"ref_allele_freq
-    ref_vector=c()
-    ref=names(df_nearby_snps["ref_allele_freq"][j,][[1]])
-    ref_vector=c(ref_vector,as.character(ref))
-    freq_ref =df_nearby_snps["ref_allele_freq"][j,]
-    for (jj in 1:length(ref_allele_freq)){
-       freq_ref_=freq_ref[[1]][[ref]][ref_allele_freq[jj]]
-       ref_vector=c(ref_vector,as.character(freq_ref_))
-       unname(ref_vector)
-      }
-    unname(ref_vector)
-    ref_allele=rbind(ref_allele,ref_vector,stringsAsFactors=FALSE)
-    colnames(ref_allele)= c("ref_allele",ref_allele_freq)
 
 
    #"maf"
@@ -143,7 +189,7 @@ if(is.list(result)){
 
   final_data=cbind(coordinates,alt_allele,rsids,chrom,ref_allele,maf,stringsAsFactors=FALSE )
   colnames(final_data)=final_names
-
+  #final_data=cbind(coordinates,maf,ref_allele,stringsAsFactors=FALSE )
 
    output1=paste0(outdir,'/',"results_Regulome.txt",sep="")
    output2=paste0(outdir,'/',"results_Regulome_nearby_snps.txt",sep="")
