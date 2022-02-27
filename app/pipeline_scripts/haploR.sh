@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -x;
-bindir="."
+#bindir is path in container
+bindir="/app/pipeline_scripts"
 type_of_analysis=$1 #{'HaploReg', "Regulome"}
 outdir=$2
 if [[ $type_of_analysis = "HaploReg" ]]; then
@@ -8,8 +9,8 @@ gwas_summary=$3
 ldThresh=$4 #0.8
 ldPop=$5    # {"AFR", "AMR", "ASN", "EUR"}
 epi=$6  # {"vanilla", "imputed", "methyl"} ---> Default "vanilla"
-cons= $7    # {"gerp",  "siphy","both"} ---> Default   "both"
-genetypes= $8  #{'gencode', 'refseq'}
+cons=$7    # {"gerp",  "siphy","both"} ---> Default   "both"
+genetypes=$8  #{'gencode', 'refseq'}
 
 Rscript --vanilla ${bindir}/HaploReg.R $gwas_summary \
 $outdir \
