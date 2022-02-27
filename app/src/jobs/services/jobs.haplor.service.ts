@@ -16,16 +16,14 @@ import {
   findAllJobs,
   removeManyUserJobs,
   removeUserJob,
-  fileSizeMb,
   deleteFileorFolder,
 } from '@cubrepgwas/pgwascommon';
 import { validateInputs } from './service.util';
 
 //production
-// const testPath =
-//   '/local/datasets/pgwas_test_files/haplor/small_data.txt';
+const testPath = '/local/datasets/pgwas_test_files/haplor/small_data.txt';
 //development
-const testPath = '/local/datasets/data/haplor/small_data.txt';
+// const testPath = '/local/datasets/data/haplor/small_data.txt';
 // const testPath = '/local/datasets/data/eqtl/UKB_bv_height_SMR_0.05.txt';
 
 @Injectable()
