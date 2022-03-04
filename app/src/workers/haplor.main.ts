@@ -54,7 +54,7 @@ export const createWorkers = async (
         haploRErrorFile = `${pathToOutputDir}/Errors_haploR.txt`;
       } else if (parameters.analysisType === AnalysisOptions.REGULOME) {
         regulomeFile = `${pathToOutputDir}/results_Regulome.txt`;
-        regulomeNearbySNPsFile = `${pathToOutputDir}/results_Regulome.txt`;
+        regulomeNearbySNPsFile = `${pathToOutputDir}/results_Regulome_nearby_snps.txt`;
       }
 
       //update db with result files
