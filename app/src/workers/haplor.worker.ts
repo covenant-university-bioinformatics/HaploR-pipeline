@@ -16,6 +16,8 @@ import {
   writeHaploRFile,
   writeLDFile,
 } from '@cubrepgwas/pgwascommon';
+import * as extract from "extract-zip";
+import * as globby from "globby";
 
 function sleep(ms) {
   console.log('sleeping');
@@ -71,22 +73,48 @@ export default async (job: SandboxedJob) => {
   fs.mkdirSync(pathToOutputDir, { recursive: true });
 
   if (parameters.analysisType === AnalysisOptions.HAPLOREG) {
+    //--1
+    let fileInput = jobParams.inputFile;
+
+    //check if file is a zipped file
+    if(/[^.]+$/.exec(jobParams.inputFile)[0] === 'zip'){
+      fs.mkdirSync(`/pv/analysis/${jobParams.jobUID}/zip`, { recursive: true });
+      await extract(jobParams.inputFile, {dir: `/pv/analysis/${jobParams.jobUID}/zip/`});
+      const paths = await globby(`/pv/analysis/${jobParams.jobUID}/zip/*.*`);
+      if (paths.length === 0){
+        throw new Error('Zip had no files')
+      }
+      if (paths.length > 1){
+        throw new Error('Zip had too many files')
+      }
+      fileInput = paths[0]
+    }
+
     //create input file and folder
     let filename;
 
+    //--2
     //extract file name
-    const name = jobParams.inputFile.split(/(\\|\/)/g).pop();
+    const name = fileInput.split(/(\\|\/)/g).pop();
 
     filename = `/pv/analysis/${jobParams.jobUID}/input/${name}`;
 
     //write the exact columns needed by the analysis
-    writeHaploRFile(jobParams.inputFile, filename, {
+    //--3
+    writeHaploRFile(fileInput, filename, {
       marker_name: parameters.marker_name - 1,
     });
 
     deleteFileorFolder(jobParams.inputFile).then(() => {
       console.log('deleted ', jobParams.inputFile);
     });
+
+    //--4
+    if(/[^.]+$/.exec(jobParams.inputFile)[0] === 'zip'){
+      deleteFileorFolder(fileInput).then(() => {
+        console.log('deleted');
+      });
+    }
 
     await HaploRJobsModel.findByIdAndUpdate(job.data.jobId, {
       inputFile: filename,
