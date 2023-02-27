@@ -21,9 +21,9 @@ export const validateInputs = async (
         throw new BadRequestException('Please upload a file');
       }
 
-      if (file.mimetype !== 'text/plain') {
-        throw new BadRequestException('Please upload a text file');
-      }
+      // if (file.mimetype !== 'text/plain') {
+      //   throw new BadRequestException('Please upload a text file');
+      // }
 
       //detect number of lines
       const liner = new lineByLine(file.path);
